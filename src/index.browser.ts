@@ -27,7 +27,26 @@ abstract class REST {
     }
 
     protected init() {
-        return Promise.resolve(true);
+        return Promise.resolve();
+    }
+
+    private _initPromise: Promise<void>;
+    private _initializing = false;
+    protected initOnlyOnce() {
+        if (!this._initPromise) {
+            this._initPromise = this.init().then(() => {
+                this._initializing = true;
+            });
+            this._initPromise.finally(() => {
+                this._initializing = false;
+            });
+        }
+        return this._initPromise;
+    }
+
+    protected reset() {
+        this._initPromise = null;
+        this._initializing = false;
     }
 
     protected rawRequest<Request, Response>(method: Method, path: Path, body?: Request) {
@@ -46,17 +65,11 @@ abstract class REST {
         return fetch<Response>(this.url(path), init);
     }
 
-    private _initializing = true;
     request<Request, Response>(method: Method, path: Path, body?: Request): Promise<Response> {
         if (this._initializing) {
             throw new Error('you cannot call request inside init function, use rawRequest instead!');
         }
-        const init = this.init();
-        this._initializing = true;
-        init.finally(() => {
-            this._initializing = false;
-        });
-        return init.then(() => this.rawRequest(method, path, body));
+        return this.initOnlyOnce().then(() => this.rawRequest(method, path, body));
     }
 
     get<Response = object>(path: Path) {

@@ -17,7 +17,8 @@ class UserService extends REST {
         super('https://host/base/url/api');
     }
 
-    async init() {
+    // will be called only once before the very first request
+    protected async init() {
         // you have to use rawRequest
         this.token = await this.rawRequest(this.url('v1/token'));
     }
