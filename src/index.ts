@@ -54,11 +54,6 @@ abstract class REST {
         return this._initPromise;
     }
 
-    protected reset() {
-        this._initPromise = null;
-        this._initializing = false;
-    }
-
     protected rawRequest<Request, Response>(method: Method, path: Path, body?: Request) {
         const init: RequestInit = {
             method,
@@ -73,6 +68,11 @@ abstract class REST {
         }
 
         return fetch<Response>(this.url(path), init);
+    }
+
+    reset() {
+        this._initPromise = null;
+        this._initializing = false;
     }
 
     request<Request, Response>(method: Method, path: Path, body?: Request): Promise<Response> {
