@@ -6,7 +6,7 @@ type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 abstract class AbstractREST {
     protected baseUrl: string;
     constructor(baseUrl: string) {
-        this.baseUrl = baseUrl;
+        this.baseUrl = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
     }
 
     protected abstract get additionalHeaders(): Record<string, string>;
