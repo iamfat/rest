@@ -1,6 +1,6 @@
 import fetch, { RequestInit } from '@genee/fetch';
 
-type Path = string | { path: string; query: string | Record<string, string> };
+type Path = string | { path: string; query: string | Record<string, string | string[]> };
 type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 abstract class AbstractREST {
