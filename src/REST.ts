@@ -32,7 +32,7 @@ abstract class AbstractREST {
         return this._initPromise;
     }
 
-    protected rawRequest<Response, Payload>(method: Method, path: Path, body?: Payload) {
+    protected rawRequest<Response = any, Payload = any>(method: Method, path: Path, body?: Payload) {
         const init: RequestInit = {
             method,
             headers: {
