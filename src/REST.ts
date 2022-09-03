@@ -18,7 +18,7 @@ abstract class AbstractREST {
         return Promise.resolve();
     }
 
-    private _initPromise: Promise<void>;
+    private _initPromise: Promise<void> | null;
     private _initializing = false;
     protected initOnlyOnce() {
         if (!this._initPromise) {
@@ -32,7 +32,7 @@ abstract class AbstractREST {
         return this._initPromise;
     }
 
-    protected rawRequest<Request, Response>(method: Method, path: Path, body?: Request) {
+    protected rawRequest<Response, Payload>(method: Method, path: Path, body?: Payload) {
         const init: RequestInit = {
             method,
             headers: {
@@ -50,31 +50,31 @@ abstract class AbstractREST {
         this._initializing = false;
     }
 
-    request<Request, Response>(method: Method, path: Path, body?: Request): Promise<Response> {
+    request<Response = any, Payload = any>(method: Method, path: Path, body?: Payload): Promise<Response> {
         if (this._initializing) {
             throw new Error('you cannot call request inside init function, use rawRequest instead!');
         }
         return this.initOnlyOnce().then(() => this.rawRequest(method, path, body));
     }
 
-    get<Response = object>(path: Path) {
-        return this.request<unknown, Response>('GET', path);
+    get<Response = any>(path: Path) {
+        return this.request<Response>('GET', path);
     }
 
-    post<Request, Response = object>(path: Path, body?: Request) {
-        return this.request<Request, Response>('POST', path, body);
+    post<Response = any, Payload = any>(path: Path, body?: Payload) {
+        return this.request<Response, Payload>('POST', path, body);
     }
 
-    put<Request, Response = object>(path: Path, body?: Request) {
-        return this.request<Request, Response>('PUT', path, body);
+    put<Response = any, Payload = any>(path: Path, body?: Payload) {
+        return this.request<Response, Payload>('PUT', path, body);
     }
 
-    patch<Request, Response = object>(path: Path, body?: Request) {
-        return this.request<Request, Response>('PATCH', path, body);
+    patch<Response = any, Payload = any>(path: Path, body?: Payload) {
+        return this.request<Response, Payload>('PATCH', path, body);
     }
 
-    delete<Response = object>(path: Path) {
-        return this.request<unknown, Response>('DELETE', path);
+    delete<Response = any>(path: Path) {
+        return this.request<Response>('DELETE', path);
     }
 }
 
