@@ -3,6 +3,8 @@ import fetch, { RequestInit } from '@genee/fetch';
 type Path = string | { path: string; query: string | Record<string, string | string[]> };
 type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
+const fetchingRequests: Record<string, Promise<any>> = {};
+
 abstract class AbstractREST {
     protected baseUrl: string;
     constructor(baseUrl: string) {
@@ -32,7 +34,12 @@ abstract class AbstractREST {
         return this._initPromise;
     }
 
+    protected hashsum(url: string, body: any): string | undefined {
+        return;
+    }
+
     protected rawRequest<Response = any, Payload = any>(method: Method, path: Path, body?: Payload) {
+        const url = this.url(path);
         const init: RequestInit = {
             method,
             headers: {
@@ -42,7 +49,18 @@ abstract class AbstractREST {
             body,
         };
 
-        return fetch<Response>(this.url(path), init);
+        const hash = this.hashsum(url, body);
+        if (hash === undefined) {
+            return fetch<Response>(url, init);
+        }
+
+        if (!(hash in fetchingRequests)) {
+            fetchingRequests[hash] = fetch<Response>(url, init);
+            fetchingRequests[hash].finally(() => {
+                delete fetchingRequests[hash];
+            });
+        }
+        return fetchingRequests[hash];
     }
 
     reset() {
