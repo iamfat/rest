@@ -34,9 +34,7 @@ abstract class AbstractREST {
         return this._initPromise;
     }
 
-    protected hashsum(url: string, body: any): string | undefined {
-        return;
-    }
+    protected hashsum?: (url: string, body: any) => string;
 
     protected rawRequest<Response = any, Payload = any>(method: Method, path: Path, body?: Payload) {
         const url = this.url(path);
@@ -49,11 +47,11 @@ abstract class AbstractREST {
             body,
         };
 
-        const hash = this.hashsum(url, body);
-        if (hash === undefined) {
+        if (this.hashsum === undefined) {
             return fetch<Response>(url, init);
         }
 
+        const hash = this.hashsum(url, body);
         if (!(hash in fetchingRequests)) {
             fetchingRequests[hash] = fetch<Response>(url, init);
             fetchingRequests[hash].finally(() => {
