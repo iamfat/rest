@@ -41,7 +41,6 @@ abstract class AbstractREST {
         const init: RequestInit = {
             method,
             headers: {
-                'Content-Type': 'application/json;charset=UTF-8',
                 ...this.additionalHeaders,
             },
             body,
