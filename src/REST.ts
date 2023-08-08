@@ -34,9 +34,15 @@ abstract class AbstractREST {
         return this._initPromise;
     }
 
+    protected timeout = 5000;
     protected hashsum?: (url: string, body: any) => string;
 
-    protected rawRequest<Response = any, Payload = any>(method: Method, path: Path, body?: Payload) {
+    protected rawRequest<Response = any, Payload = any>(
+        method: Method,
+        path: Path,
+        body?: Payload,
+        init_?: RequestInit,
+    ) {
         const url = this.url(path);
         const init: RequestInit = {
             method,
@@ -44,6 +50,8 @@ abstract class AbstractREST {
                 ...this.additionalHeaders,
             },
             body,
+            timeout: this.timeout,
+            ...init_,
         };
 
         if (this.hashsum === undefined) {
@@ -65,31 +73,36 @@ abstract class AbstractREST {
         this._initializing = false;
     }
 
-    request<Response = any, Payload = any>(method: Method, path: Path, body?: Payload): Promise<Response> {
+    request<Response = any, Payload = any>(
+        method: Method,
+        path: Path,
+        body?: Payload,
+        init?: RequestInit,
+    ): Promise<Response> {
         if (this._initializing) {
             throw new Error('you cannot call request inside init function, use rawRequest instead!');
         }
-        return this.initOnlyOnce().then(() => this.rawRequest(method, path, body));
+        return this.initOnlyOnce().then(() => this.rawRequest(method, path, body, init));
     }
 
-    get<Response = any>(path: Path) {
-        return this.request<Response>('GET', path);
+    get<Response = any>(path: Path, init?: RequestInit) {
+        return this.request<Response>('GET', path, init);
     }
 
-    post<Response = any, Payload = any>(path: Path, body?: Payload) {
-        return this.request<Response, Payload>('POST', path, body);
+    post<Response = any, Payload = any>(path: Path, body?: Payload, init?: RequestInit) {
+        return this.request<Response, Payload>('POST', path, body, init);
     }
 
-    put<Response = any, Payload = any>(path: Path, body?: Payload) {
-        return this.request<Response, Payload>('PUT', path, body);
+    put<Response = any, Payload = any>(path: Path, body?: Payload, init?: RequestInit) {
+        return this.request<Response, Payload>('PUT', path, body, init);
     }
 
-    patch<Response = any, Payload = any>(path: Path, body?: Payload) {
-        return this.request<Response, Payload>('PATCH', path, body);
+    patch<Response = any, Payload = any>(path: Path, body?: Payload, init?: RequestInit) {
+        return this.request<Response, Payload>('PATCH', path, body, init);
     }
 
-    delete<Response = any>(path: Path) {
-        return this.request<Response>('DELETE', path);
+    delete<Response = any>(path: Path, init?: RequestInit) {
+        return this.request<Response>('DELETE', path, init);
     }
 }
 
