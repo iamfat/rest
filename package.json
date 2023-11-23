@@ -1,6 +1,6 @@
 {
   "name": "@genee/rest",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "browser": {
@@ -17,12 +17,12 @@
     "build": "node esbuild.config.mjs && pnpm build:types:node && pnpm build:types:browser"
   },
   "devDependencies": {
-    "@genee/fetch": "^1.6.2",
+    "@genee/fetch": "^1.7.0",
     "@types/node": "^18.17.3",
     "esbuild": "^0.18.19",
     "typescript": "^5.1.6"
   },
   "peerDependencies": {
-    "@genee/fetch": "^1.6.2"
+    "@genee/fetch": "^1.7.0"
   }
 }

@@ -37,6 +37,12 @@ abstract class AbstractREST {
     protected timeout = 5000;
     protected hashsum?: (url: string, body: any) => string;
 
+    private _cookie?: string;
+
+    get cookie() {
+        return this._cookie;
+    }
+
     protected rawRequest<Response = any, Payload = any>(
         method: Method,
         path: Path,
@@ -45,13 +51,31 @@ abstract class AbstractREST {
     ) {
         const url = this.url(path);
         const init: RequestInit = {
+            ...init_,
             method,
             headers: {
+                ...init_?.headers,
                 ...this.additionalHeaders,
             },
             body,
             timeout: this.timeout,
-            ...init_,
+            beforeRequest: (url, init) => {
+                init_?.beforeRequest?.(url, init);
+                if (this._cookie) {
+                    init.headers = { ...init.headers, cookie: this._cookie };
+                    init.credentials = 'include';
+                }
+            },
+            customParser: (r: any, defaultParser: (r: any) => Promise<any>) => {
+                const setCookie = r.headers.get('set-cookie');
+                if (setCookie) {
+                    this._cookie = setCookie
+                        .replace(/expires=(.+?);\s/gi, '')
+                        .replace(/path=\/(,?)(\s?)/gi, '')
+                        .trim();
+                }
+                return defaultParser(r);
+            },
         };
 
         if (this.hashsum === undefined) {
