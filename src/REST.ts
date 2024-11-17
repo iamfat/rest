@@ -51,6 +51,7 @@ abstract class AbstractREST {
     ) {
         const url = this.url(path);
         const init: RequestInit = {
+            timeout: this.timeout,
             ...init_,
             method,
             headers: {
@@ -58,7 +59,6 @@ abstract class AbstractREST {
                 ...this.additionalHeaders,
             },
             body,
-            timeout: this.timeout,
             beforeRequest: (url, init) => {
                 init_?.beforeRequest?.(url, init);
                 if (this._cookie) {
