@@ -110,7 +110,7 @@ abstract class AbstractREST {
     }
 
     get<Response = any>(path: Path, init?: RequestInit) {
-        return this.request<Response>('GET', path, init);
+        return this.request<Response>('GET', path, undefined, init);
     }
 
     post<Response = any, Payload = any>(path: Path, body?: Payload, init?: RequestInit) {
